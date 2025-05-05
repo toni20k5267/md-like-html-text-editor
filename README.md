@@ -21,7 +21,7 @@ Ekhm, anyways...
 ### 3. The final design
 <img width="1640" alt="kocham alternatywki" src="https://github.com/user-attachments/assets/642706c7-ef61-4b34-b112-c7b9d5a967f3" />
 Yup... this is the final design. I know it is not the best, but then again, I started coding this shit at like, 1:30, until then I was just designing it and trying to come up with a list of shi that needs to be done. Btw, this is it(yes i put it in an md lol):
-# Markdown-Like Text Editor Web App – SPECIFICATION!!!!![image](https://github.com/user-attachments/assets/a5cedeae-3b18-4dde-bea9-afe1d69705d2)
+# Markdown-Like Text Editor Web App – SPECIFICATION!!!!! [image](https://github.com/user-attachments/assets/a5cedeae-3b18-4dde-bea9-afe1d69705d2)
 
 
 This document outlines the feature set and tasks required for building a browser-based, markdown-style text editor interface. The editor supports multiple text sections, md-like formatting, a dual text mode (normal/advanced), JSON export, HTML rendering with scoped styling, and a full-page help popup.
