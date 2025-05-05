@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown Text Editor</title>
+  <style>
+    body {
+      background-color: #0c0b17;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      color: white;
+    }
+  
+    a {
+      color: #adacac;
+      text-decoration: underline 0.7px #adacac;
+      text-underline-offset: 2px;
+      transition: all 0.7s ease-in-out;
+    }
+  
+    a:hover {
+      color: rgb(137, 137, 137);
+      text-decoration: underline 0.8px rgb(137, 137, 137);
+      text-underline-offset: 2.1px;
+    }
+  
+    .toolbar, .text-section-container {
+      background-color: #323140;
+      padding: 20px;
+      border: 1px solid #5b5b5b;
+      margin-bottom: 40px;
+      border-radius: 17px;
+      margin-top: -20px;
+      padding-top: 40px;
+      text-align: center;
+    }
+  
+    .title-editor {
+      border: 3px dashed #5b5b5b;
+      padding: 10px;
+      background-color: #3f3d50;
+      display: inline-block;
+      border-radius: 17px;
+      text-align: center;
+      align-content: center;
+      font-size: 16px;
+    }
+  
+    .btn {
+      background-color: #3f3d50;
+      border: 1px solid #5b5b5b;
+      padding: 15px 25px;
+      cursor: pointer;
+      color: white;
+      margin-left: 10px;
+      border-radius: 17px;
+      font-size: 16px;
+      transition: background-color 0.33s ease;
+    }
+  
+    .btn:hover {
+      background-color: #35334a;
+    }
+  
+    .text-section {
+      background-color: #2d2c39;
+      padding: 20px;
+      border: 1px solid #5b5b5b;
+      margin-bottom: 40px;
+      border-radius: 17px;
+    }
+  
+    .text-input {
+      width: 100%;
+      background-color: #2d2c39;
+      color: white;
+      border: none;
+      outline: none;
+      resize: none;
+      font-size: 16px;
+      border-radius: 17px;
+      padding: 10px;
+    }
+  
+    .add-section-btn {
+      display: inline-block;
+      height: 40px;
+      width: 150px;
+      background-color: #3f3d50;
+      border: 1px solid #5b5b5b;
+      border-radius: 17px;
+      cursor: pointer;
+      color: white;
+      margin-right: 10px;
+      transition: background-color 0.33s ease;
+      text-align: center;
+    }
+  
+    .add-section-btn:hover {
+      background-color: #35334a;
+    }
+  
+    #helpPopup {
+      display: none;
+    }
+  
+    .popup-help {
+      position: fixed;
+      top: 120px;
+      left: 120px;
+      right: 120px;
+      bottom: 120px;
+      background-color: #2d2c39;
+      border: 1px solid #5b5b5b;
+      z-index: 1000;
+      overflow-y: auto;
+      padding: 40px;
+      border-radius: 17px;
+      display: flex;
+      flex-direction: row;
+      gap: 40px;
+    }
+  
+    .popup-col {
+      width: 300px;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+  
+    .help-button-wrapper {
+      margin-bottom: 20px;
+      border: 1px solid #5b5b5b;
+      border-radius: 17px;
+      overflow: hidden;
+      background-color: #3f3d50;
+      transition: all 0.3s ease;
+    }
+  
+    .help-toggle {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 16px;
+      padding: 10px 15px;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+  
+    .help-toggle:hover {
+      background-color: #35334a;
+    }
+  
+    .help-toggle.expanded::after {
+      content: ':';
+    }
+  
+    .help-desc {
+      padding: 0 15px;
+      color: white;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+    }
+  
+    .help-desc.visible {
+      max-height: 600px;
+      padding: 10px 15px;
+    }
+  
+    .popup-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      display: none;
+    }
+  
+    .help-btn {
+      position: fixed;
+      right: 20px;
+      top: 25px;
+      background-color: #3f3d50;
+      border-radius: 17px;
+      width: 40px;
+      height: 40px;
+      text-align: center;
+      line-height: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      border: 1px solid #5b5b5b;
+      z-index: 1001;
+      transition: background-color 0.33s ease;
+    }
+  
+    .help-btn:hover {
+      background-color: #35334a;
+    }
+  
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 25px;
+      vertical-align: middle;
+    }
+  
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+  
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 17px;
+      border: 1px solid #5b5b5b;
+    }
+  
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 19px;
+      width: 19px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+  
+    input:checked + .slider {
+      background-color: #3f3d50;
+    }
+  
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+  
+    .playground {
+      background-color: #2d2c39;
+      border: 1px solid #5b5b5b;
+      padding: 20px;
+      margin: 40px;
+      border-radius: 17px;
+      min-height: 100px;
+      cursor: text;
+      color: white;
+    }
+    .title-editor:hover,
+    .title-editor:focus {
+      background-color: #35334a;
+    }
+    #rmvlast{
+      background-color: #3f3d50;
+      border: 1px solid #5b5b5b;
+      width: 150px;
+      cursor: pointer;
+      color: white;
+      margin-left: 10px;
+      border-radius: 17px;
+      font-size: 16px;
+      transition: background-color 0.33s ease;
+      height: 40px;
+    }
+    #rmvlast:hover {
+      background-color: #35334a;
+    }
+    .button-container {
+      display: inline-block;
+    }
+  </style>
+  
+</head>
+<body>
+  <div class="toolbar" style="display: flex;">
+    <div class="title-editor" contenteditable="true">Untitled</div>
+    <button class="btn" onclick="exportContent()">Export JSON</button>
+    <button class="btn" onclick="exportAsHTML()">Export HTML</button>
+    <button class="btn" onclick="loadJSON()">Load JSON</button>
+    <label class="btn">Copy
+      <label class="toggle-switch">
+        <input type="checkbox" id="copyToggle">
+        <span class="slider"></span>
+      </label>
+    </label>
+  </div>
+
+  <div id="textSections" class="text-section-container">
+    <div class="button-container">
+      <button class="add-section-btn" onclick="createTextSection()">+</button>
+      <button id="rmvlast" onclick="confirmRemoveSection()">Remove Last</button>
+    </div>
+  </div>
+
+  <div class="popup-help" id="helpPopup" style="float: none;">
+    <div class="popup-col" id="helpButtons" style="float: left;">
+      <div class="help-button-wrapper">
+        <button class="help-toggle" onclick="toggleExpand(this)">Emphasis/Italic</button>
+        <div class="help-desc">*italic* → <em>italic</em><br><em>Use to highlight emphasis without implying importance.</em></div>
+      </div>
+      <div class="help-button-wrapper">
+        <button class="help-toggle" onclick="toggleExpand(this)">Strong/Bold</button>
+        <div class="help-desc">**bold** → <strong>bold</strong><br><em>Use for key terms or important labels.</em></div>
+      </div>
+      <div class="help-button-wrapper">
+        <button class="help-toggle" onclick="toggleExpand(this)">Bolditalic</button>
+        <div class="help-desc">***bolditalic*** → <strong><em>bolditalic</em></strong><br><em>Use for very strong emphasis, such as warnings or highlights.</em></div>
+      </div>
+      <div class="help-button-wrapper">
+        <button class="help-toggle" onclick="toggleExpand(this)">Underline</button>
+        <div class="help-desc">_underline_ → <u>underline</u><br><em>Use for headings or underlined names/titles.</em></div>
+      </div>
+      <div class="help-button-wrapper">
+        <button class="help-toggle" onclick="toggleExpand(this)">Strikethrough</button>
+        <div class="help-desc">~strike~ → <s>strike</s><br><em>Use to show outdated or corrected content.</em></div>
+      </div>
+      <div class="help-button-wrapper">
+        <button class="help-toggle" onclick="toggleExpand(this)">Code</button>
+        <div class="help-desc">{code} → <code>code</code><br><em>Use for literal code, paths, or commands, or when you want to make something stand out in a different way.</em></div>
+      </div>
+      <div class="help-button-wrapper">
+        <button class="help-toggle" onclick="toggleExpand(this)">Headings</button>
+        <div class="help-desc"># → <h1>Heading 1</h1>## → <h2>Heading 2</h2>### → <h3>Heading 3</h3><br><em>Use for structure, sectioning, and hierarchy.</em></div>
+      </div>
+      <div class="help-button-wrapper">
+        <button class="help-toggle" onclick="toggleExpand(this)">Links</button>
+        <div class="help-desc">[example](https://example.com) → <a href="https://example.com" target="_blank">example</a><br><em>Use to reference external or internal sites or documentation. When linking an external site remember to use the https:// prefix.</em></div>
+      </div>
+      <div class="help-button-wrapper">
+        <button class="help-toggle" onclick="toggleExpand(this)">Escape</button>
+        <div class="help-desc">\* not italic * → displays asterisks<br><em>Use when you want formatting symbols to appear as text.</em></div>
+      </div>
+      <div class="help-button-wrapper">
+        <button class="help-toggle" onclick="toggleExpand(this)">Spoiler</button>
+        <div class="help-desc">||spoiler|| → <span style="background:#444;color:#444;cursor:pointer" onclick="this.style.color='white'">spoiler</span><br><em>Use to hide details, spoilers, or answers.</em></div>
+      </div>
+    </div>
+    <div class="popup-col" style="float: right; width: 1000px; height: 600px;">
+      <h3>Playground</h3>
+      <div class="playground" id="playground" contenteditable="true" style="padding: 10px; background:#3f3d50; border:1px solid #5b5b5b; border-radius: 17px; color:white; min-height: 455px;"></div>
+    </div>
+  </div>
+  <div class="popup-backdrop" id="popupBackdrop"></div>
+
+  <div class="help-btn" onclick="toggleHelpPopup()">?</div>
+  
+
+  <script>
+    // Thank GOD for Wimdwsurf's/Codeuim's Refactor function. I would NOT comment all this shi without it bruh. 
+    // This way maybe some can understand this asbolute abomination i made lol...
+
+    /**
+     * The UnsavedChangesGuard class is used to prevent the user from leaving the page
+     * without saving their changes. It does this by listening for the 'beforeunload'
+     * event and prompting the user to confirm if they have unsaved changes.
+     */
+    class UnsavedChangesGuard {
+      /**
+       * The constructor for the UnsavedChangesGuard class.
+       * It sets up the event listener for the 'beforeunload' event.
+       */
+      constructor() {
+        /**
+         * The modified property is used to keep track of whether there are
+         * unsaved changes on the page.
+         * @type {boolean}
+         */
+        this.modified = false;
+
+        /**
+         * Add an event listener for the 'beforeunload' event.
+         * This event is fired when the user tries to leave the page.
+         */
+        window.addEventListener('beforeunload', this.handleBeforeUnload.bind(this));
+      }
+
+      /**
+       * The handleBeforeUnload method is called when the user tries to leave the page.
+       * It checks if there are unsaved changes and prompts the user to confirm
+       * if they are sure they want to leave.
+       * @param {Event} event The event that triggered the function.
+       */
+      handleBeforeUnload(event) {
+        /**
+         * If there are unsaved changes, prompt the user to confirm if they
+         * are sure they want to leave.
+         */
+        if (this.modified) {
+          event.preventDefault();
+          event.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        }
+      }
+
+      /**
+       * The markAsModified method marks the page as having unsaved changes.
+       */
+      markAsModified() {
+        this.modified = true;
+      }
+
+      /**
+       * The markAsSaved method marks the page as having no unsaved changes.
+       */
+      markAsSaved() {
+        this.modified = false;
+      }
+    }
+
+    const guard = new UnsavedChangesGuard();
+
+  /**
+   * Toggles the visibility of the help popup and its backdrop.
+   * When the popup is displayed, the playground becomes editable.
+   */
+  function toggleHelpPopup() {
+    // Get the popup and backdrop elements by their IDs
+    const popup = document.getElementById('helpPopup');
+    const backdrop = document.getElementById('popupBackdrop');
+    
+    // Determine if the popup is currently displayed
+    const showing = popup.style.display === 'block';
+    
+    // Make the playground content editable when showing the popup
+    if (!showing) {
+      document.getElementById('playground').contentEditable = true;
+    }
+    
+    // Toggle the display style of the popup and backdrop
+    popup.style.display = showing ? 'none' : 'block';
+    backdrop.style.display = showing ? 'none' : 'block';
+  }
+
+  document.getElementById('popupBackdrop').addEventListener('click', toggleHelpPopup);
+
+  /**
+   * Toggles the visibility of the help description associated with a button.
+   * This function will expand or collapse the description based on the current state.
+   *
+   * @param {HTMLElement} button - The button element that was clicked to toggle the description.
+   */
+  function toggleExpand(button) {
+    // Get the next sibling element, which is the description to toggle
+    const desc = button.nextElementSibling;
+    
+    // Check if the button currently has the 'expanded' class
+    const expanded = button.classList.contains('expanded');
+    
+    // Toggle the 'expanded' class on the button
+    button.classList.toggle('expanded', !expanded);
+    
+    // Toggle the 'visible' class on the description
+    desc.classList.toggle('visible', !expanded);
+  }
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const playground = document.getElementById('playground');
+    playground.addEventListener('blur', () => {
+      const raw = playground.innerText;
+      playground.innerHTML = parseMarkdown(raw);
+      playground.contentEditable = false;
+    });
+    playground.addEventListener('click', () => {
+      if (!playground.isContentEditable) {
+        const raw = playground.innerText;
+        playground.innerText = raw;
+        playground.contentEditable = true;
+      }
+    });
+  });
+  
+  /**
+   * Creates a new text section and inserts it into the document.
+   * The text section includes a textarea input where users can type their content.
+   * When the textarea receives input, it marks the document as modified.
+   */
+  function createTextSection() {
+    // Get the container for text sections
+    const container = document.getElementById('textSections');
+    
+    // Find the button container within the text sections container
+    const buttonContainer = container.querySelector('.button-container');
+    
+    // Create a wrapper div for the new text section
+    const wrapper = document.createElement('div');
+    wrapper.className = 'text-section';
+
+    // Create a textarea for user input within the text section
+    const textarea = document.createElement('textarea');
+    textarea.className = 'text-input';
+    textarea.rows = 4;
+
+    // Add an event listener to mark the document as modified on input
+    textarea.addEventListener('input', () => {
+      guard.markAsModified();
+    });
+
+    // Set a placeholder for the textarea
+    textarea.placeholder = 'Type here...';
+    
+    // Append the textarea to the wrapper div
+    wrapper.appendChild(textarea);
+    
+    // Insert the new text section before the button container
+    container.insertBefore(wrapper, buttonContainer);
+  }
+
+  /**
+   * Confirms and removes the last text section from the document.
+   * This function checks if there are any text sections present.
+   * If confirmed by the user, it removes the last text section.
+   */
+  function confirmRemoveSection() {
+    // Get the container holding all text sections
+    const container = document.getElementById('textSections');
+
+    // Select all text section elements within the container
+    const textSections = container.querySelectorAll('.text-section');
+    
+    // If there are no text sections, exit the function
+    if (textSections.length === 0) return;
+    
+    // Get the last text section in the list
+    const lastTextSection = textSections[textSections.length - 1];
+
+    // Ask the user for confirmation before removing the text section
+    if (confirm('Remove the last text section?')) {
+      // Remove the last text section from the container
+      container.removeChild(lastTextSection);
+    }
+  }
+
+  function parseMarkdown(text) {
+    text = text.replace(/<br>/g, '<<MANUAL_BR>>');
+
+    text = text.replace(/&/g, '&amp;')
+               .replace(/</g, '&lt;')
+               .replace(/>/g, '&gt;');
+
+    text = text.replace(/&lt;&lt;MANUAL_BR&gt;&gt;/g, '&lt;br&gt;');
+
+    text = text.replace(/\n/g, '<br>');
+
+    text = text.replace(/\\\*/g, '__ESCAPED_ASTERISK__')
+               .replace(/\\_/g, '__ESCAPED_UNDERSCORE__')
+               .replace(/\\~/g, '__ESCAPED_TILDE__')
+               .replace(/\\#/g, '__ESCAPED_HASH__')
+               .replace(/\\\|\|/g, '__ESCAPED_SPOILER__');
+
+    text = text.replace(/\*\*\*(.+?)\*\*\*/g, '<em><strong>$1</strong></em>')
+               .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+               .replace(/\*(.+?)\*/g, '<em>$1</em>')
+               .replace(/_(.+?)_/g, '<u>$1</u>')
+               .replace(/~(.+?)~/g, '<s>$1</s>')
+               .replace(/\{(.+?)\}/g, '<code>$1</code>')
+               .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+               .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+               .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+               .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>')
+               .replace(/\|\|(.+?)\|\|/g, '<span style="background:#444;color:#444;cursor:pointer" onclick="this.style.color=\'white\'">$1</span>');
+
+    text = text.replace(/__ESCAPED_ASTERISK__/g, '*')
+               .replace(/__ESCAPED_UNDERSCORE__/g, '_')
+               .replace(/__ESCAPED_TILDE__/g, '~')
+               .replace(/__ESCAPED_HASH__/g, '#')
+               .replace(/__ESCAPED_SPOILER__/g, '||');
+
+    return text;
+  }
+
+  /**
+   * Exports the content as an HTML file or copies it to the clipboard.
+   * The HTML includes styled sections with the content from each text input.
+   */
+  function exportAsHTML() {
+    // Get the title from the title editor and format it for the filename
+    const title = document.querySelector('.title-editor').innerText.trim().replace(/\s+/g, '-');
+    
+    // Select all text input sections
+    const sections = document.querySelectorAll('.text-input');
+    
+    // Convert each section's content to a paragraph element with Markdown parsed
+    const content = Array.from(sections).map((s, i) => `<p class="p p${i + 1}">${parseMarkdown(s.value)}</p>`).join('\n');
+    
+    // Define CSS for the exported HTML
+    const css = `
+      section.${title} {
+        background-color: #2d2c39;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: sans-serif;
+        font-size: 1.2em;
+        line-height: 1.5em;
+        padding: 30px;
+        margin: 0 auto;
+        max-width: 600px;
+        border: 1px solid #5b5b5b;
+        border-radius: 17px;
+      }
+      section.${title} h1 {
+        font-size: 2em;
+        margin-bottom: 10px;
+      }
+      section.${title} p {
+        margin-bottom: 20px;
+      }
+      section.${title} p:last-child {
+        margin-bottom: 0;
+      }
+      .${title} .p, ${Array.from(sections).map((_, i) => `.${title} .p${i + 1}`).join(', ')} {
+        color: white;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #5b5b5b;
+      }
+    `;
+    
+    // Construct the full HTML with content and styles
+    const html = `<section class="${title}">\n${content}\n<style>${css}</style>\n</section>`;
+    
+    // Check if the copy toggle is enabled
+    if (document.getElementById('copyToggle').checked) {
+      // Copy HTML to clipboard and alert the user
+      navigator.clipboard.writeText(html).then(() => alert('HTML copied'));
+    } else {
+      // Create a downloadable HTML file
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${title}.html`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  /**
+   * Exports the content of each text section as a JSON file or copies it to the clipboard.
+   * The JSON file will be named after the title of the document, and will contain an array of objects
+   * with the following shape: { id: string, content: string }, where id is a string identifying the
+   * section (e.g. "p1", "p2", etc.), and content is the text content of the section.
+   * The content is escaped with newline characters replaced with \\n.
+   */
+  function exportContent() {
+    const title = document.querySelector('.title-editor').innerText.trim().replace(/\s+/g, '-');
+    const sections = document.querySelectorAll('.text-input');
+    const data = Array.from(sections).map((s, i) => ({ id: `p${i + 1}`, content: s.value.replace(/\n/g, '\\n') }));
+
+    if (document.getElementById('copyToggle').checked) {
+      // Copy JSON to clipboard and alert the user
+      navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => alert('Copied to clipboard'));
+      return;
+    }
+
+    // Create a downloadable JSON file
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    guard.markAsSaved();
+  }
+
+  /**
+   * Load JSON content from a file or from the clipboard.
+   * If the checkbox is checked, prompt the user for JSON content in a text box.
+   * If the checkbox is not checked, prompt the user to select a JSON file.
+   */
+  function loadJSON() {
+    if (document.getElementById('copyToggle').checked) {
+      // Load from clipboard
+      const content = prompt('Paste your JSON content:');
+      if (!content) return;
+      
+      try {
+        const data = JSON.parse(content);
+        populateSections(data);
+      } catch (e) {
+        alert('Invalid JSON');
+      }
+    } else {
+      // Load from file
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            populateSections(data);
+          } catch (e) {
+            alert('Invalid JSON file');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+  }
+
+  /**
+   * Populates the text sections container with data.
+   * This function clears any existing text sections and creates new ones
+   * based on the provided data array.
+   * 
+   * @param {Array} data - An array of objects where each object has a 'content' property
+   *                       representing the text content for each section.
+   */
+  function populateSections(data) {
+    // Get the container for text sections
+    const container = document.getElementById('textSections');
+    
+    // Find the button container within the text sections container
+    const buttonContainer = container.querySelector('.button-container');
+    
+    // Select all existing text sections and remove them
+    const sections = container.querySelectorAll('.text-section');
+    sections.forEach(section => section.remove());
+    
+    // Iterate over the data array to create new text sections
+    data.forEach(item => {
+      // Create a wrapper div for the new text section
+      const wrapper = document.createElement('div');
+      wrapper.className = 'text-section';
+      
+      // Create a textarea for user input within the text section
+      const textarea = document.createElement('textarea');
+      textarea.className = 'text-input';
+      textarea.rows = 4;
+      // Set the value of the textarea with the content from the data item
+      textarea.value = item.content.replace(/\\n/g, '\n');
+      
+      // Append the textarea to the wrapper div
+      wrapper.appendChild(textarea);
+      
+      // Insert the new text section before the button container
+      container.insertBefore(wrapper, buttonContainer);
+    });
+  }
+  
+  </script>
+  <footer style="border-top-right-radius: 17px; border-top-left-radius: 17px; background-color: #2d2c39; color: white; padding: 15px; text-align: center; position: fixed; bottom: 0; width: 100%; box-sizing: border-box; border-top: 1px solid #5b5b5b; font-size: 0.8em;">
+  © 2025 Toni20k5267. Licensed under Apache License 2.0.
+    <a href="/LICENSE">View License</a>
+  </footer>
+</body>
+</html>
